@@ -42,6 +42,6 @@ find "$input_dir" -type f | while read -r input_file; do
 done
 #--5--
 maxdepth=""
-for f in $(find "$in_dir" -maxdepth maxdepth -type f); do
+for f in $(find "$in_dir" -maxdepth "$maxdepth" -type f); do
     cp "$f" "$out_dir/"
 done
