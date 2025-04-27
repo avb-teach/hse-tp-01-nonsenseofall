@@ -6,7 +6,7 @@ fi
 #--2--
 in_dir="$1"
 out_dir="$2"
-
+max_depth=""
 mkdir -p "$out_dir"
 for f in $(find "$in_dir" -maxdepth 2 -type f); do
     cp "$f" "$out_dir/"
@@ -41,3 +41,22 @@ find "$input_dir" -type f | while read -r input_file; do
 
 done
 #--5--
+
+
+if [[ $# -ge 2 && "$1" == "--max_depth" ]]; then #https://www.gnu.org/software/bash/manual/bash.html#Conditional-Constructs
+  max_depth="$2"
+fi
+mkdir -p "$out_dir"
+depth_arg=""
+if [[ -n "$max_depth" ]]; then
+  depth_arg="-maxdepth $max_depth"
+fi
+
+for file in $(find "$in_dir" $depth_arg -type f); do
+  rel="${file#$in_dir/}" #уже указывал источник где прочитал  про postfix
+  dir_part=$(dirname "$rel") ##https://man7.org/linux/man-pages/man1/dirname.1.html
+  base_name=$(basename "$rel") #https://man7.org/linux/man-pages/man1/basename.1.html
+
+  mkdir -p "$out_dir/$dir_part"
+  cp -- "$file" "$out_dir/$dir_part/$base_name"
+done
