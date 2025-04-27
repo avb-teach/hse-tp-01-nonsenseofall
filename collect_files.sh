@@ -1,3 +1,2 @@
-set -e 
-if [ "$#" -ne 2 ]; then
-exit 1
+#!/usr/bin/env bash
+if [ "$#" -ne 2 ] || exit 1
