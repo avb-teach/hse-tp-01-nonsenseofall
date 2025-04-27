@@ -41,3 +41,57 @@ find "$input_dir" -type f | while read -r input_file; do
 
 done
 #--5--
+max_depth=""
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --max_depth)
+            max_depth="$2"
+            shift 2
+            ;;
+        --in_dir)
+            in_dir="$2"
+            shift 2
+            ;;
+        --out_dir)
+            out_dir="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Validate input and output directories
+if [[ -z "$in_dir" || -z "$out_dir" ]]; then
+    echo "Error: Both --in_dir and --out_dir are required."
+    exit 1
+fi
+
+if [[ ! -d "$in_dir" ]]; then
+    echo "Error: Input directory $in_dir does not exist."
+    exit 1
+fi
+
+# Build the `find` command arguments
+depth_arg=(-type f)
+if [[ -n "$max_depth" ]]; then
+    depth_arg=(-maxdepth "$max_depth" "${depth_arg[@]}")
+fi
+
+# Process files with `find` and copy them
+find "$in_dir" "${depth_arg[@]}" | while read -r file; do
+    relative_path="${file#$in_dir/}"
+    dir_path=$(dirname -- "$relative_path")
+    dest_dir="$out_dir/$dir_path"
+    dest="$dest_dir/$(basename -- "$file")"
+
+    # Ensure destination directory exists
+    mkdir -p -- "$dest_dir"
+
+    # Copy the file
+    cp -- "$file" "$dest"
+done
