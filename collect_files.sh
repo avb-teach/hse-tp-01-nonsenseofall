@@ -41,7 +41,7 @@ find "$input_dir" -type f | while read -r input_file; do
 
 done
 #--5--
-
+#тест
 max_depth="" 
 
 while [[ $# -gt 0 ]]; do # В этой версии хочу убедиться в правильночти получения max depth в омандной строке
