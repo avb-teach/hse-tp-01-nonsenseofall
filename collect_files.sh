@@ -11,3 +11,4 @@ mkdir -p "$out_dir"
 for f in $(find "$in_dir" -maxdepth 2 -type f); do
     cp "$f" "$out_dir/"
 done
+# 2 готово!
