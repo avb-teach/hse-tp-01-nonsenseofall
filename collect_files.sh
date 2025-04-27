@@ -46,7 +46,6 @@ max_depth=""
 if [[ $# -ge 2 && "$1" == "--max_depth" ]]; then #https://www.gnu.org/software/bash/manual/bash.html#Conditional-Constructs
   max_depth="$2"
 fi
-mkdir -p "$out_dir"
 depth_arg=""
 if [[ -n "$max_depth" ]]; then
   depth_arg="-maxdepth $max_depth"
@@ -56,7 +55,7 @@ for file in $(find "$in_dir" $depth_arg -type f); do
   rel="${file#$in_dir/}" #уже указывал источник где прочитал  про postfix
   dir_part=$(dirname "$rel") ##https://man7.org/linux/man-pages/man1/dirname.1.html
   base_name=$(basename "$rel") #https://man7.org/linux/man-pages/man1/basename.1.html
-  mkdir -p "$out_dir/$dir_part"
+
   cp -- "$file" "$out_dir/$dir_part/$base_name"
-  echo "Скопирован: $out_dir/$dir_part/$base_name"
+
 done
