@@ -34,7 +34,7 @@ find "$input_dir" -type f | while read -r input_file; do
     while [[ -e "$output_path" ]]; do #проверка файла на exist https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html
         new_filename="${file_name_no_ext}_${counter}.${file_extension}"
         output_path="$output_dir/$new_filename"
-        ((counter++))
+        ((counter++)) #забыл добавить ссылку на корректное увеличение varaible https://askubuntu.com/questions/385528/how-to-increment-a-variable-in-bash
     done
 
     cp "$input_file" "$output_path"
