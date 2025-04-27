@@ -42,13 +42,7 @@ find "$input_dir" -type f | while read -r input_file; do
 done
 #--5--
 
-
-#!/bin/bash
-
-# Параметры по умолчанию
-in_dir="input_dir"
-out_dir="output_dir"
-max_depth=""  # По умолчанию без ограничения глубины
+max_depth="" 
 
 while [[ $# -gt 0 ]]; do # В этой версии хочу убедиться в правильночти получения max depth в омандной строке
     case "$1" in
@@ -57,10 +51,8 @@ while [[ $# -gt 0 ]]; do # В этой версии хочу убедиться 
             shift 2
             ;;
         *)
-            echo "Неизвестный параметр: $1"
             exit 1
             ;;
-            
     esac
 done
 depth_arg=("$in_dir" -type f)
@@ -69,13 +61,8 @@ if [[ -n "$max_depth" ]]; then
 fi
 find "${depth_arg[@]}" | while read -r file; do
     relative_path="${file#$in_dir/}"
-    
     dir_path=$(dirname -- "$relative_path")
-    filename=$(basename -- "$relative_path")
-    mkdir -p "$out_dir/$dir_path"
-    
+    filename=$(basename -- "$relative_path")  
     dest="$out_dir/$dir_path/$filename"
-    
     cp -- "$file" "$dest"
-
 done
