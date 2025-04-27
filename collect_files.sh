@@ -43,20 +43,39 @@ done
 #--5--
 
 
-if [[ $# -ge 2 && "$1" == "--max_depth" ]]; then #https://www.gnu.org/software/bash/manual/bash.html#Conditional-Constructs
-  max_depth="$2"
-fi
-mkdir -p "$out_dir"
-depth_arg=""
+#!/bin/bash
+
+# Параметры по умолчанию
+in_dir="input_dir"
+out_dir="output_dir"
+max_depth=""  # По умолчанию без ограничения глубины
+
+while [[ $# -gt 0 ]]; do # В этой версии хочу убедиться в правильночти получения max depth в омандной строке
+    case "$1" in
+        --max_depth)
+            max_depth="$2"
+            shift 2
+            ;;
+        *)
+            echo "Неизвестный параметр: $1"
+            exit 1
+            ;;
+            
+    esac
+done
+depth_arg=("$in_dir" -type f)
 if [[ -n "$max_depth" ]]; then
-  depth_arg="-maxdepth $max_depth"
+    depth_arg+=(-maxdepth "$max_depth")
 fi
+find "${depth_arg[@]}" | while read -r file; do
+    relative_path="${file#$in_dir/}"
+    
+    dir_path=$(dirname -- "$relative_path")
+    filename=$(basename -- "$relative_path")
+    mkdir -p "$out_dir/$dir_path"
+    
+    dest="$out_dir/$dir_path/$filename"
+    
+    cp -- "$file" "$dest"
 
-for file in $(find "$in_dir" $depth_arg -type f); do
-  rel="${file#$in_dir/}" #уже указывал источник где прочитал  про postfix
-  dir_part=$(dirname "$rel") ##https://man7.org/linux/man-pages/man1/dirname.1.html
-  base_name=$(basename "$rel") #https://man7.org/linux/man-pages/man1/basename.1.html
-
-  mkdir -p "$out_dir/$dir_part"
-  cp -- "$file" "$out_dir/$dir_part/$base_name"
 done
