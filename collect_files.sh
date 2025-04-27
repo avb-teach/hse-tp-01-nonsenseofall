@@ -41,21 +41,3 @@ find "$input_dir" -type f | while read -r input_file; do
 
 done
 #--5--
-
-max_depth=""
-if [[ $# -ge 2 && "$1" == "--max_depth" ]]; then #https://www.gnu.org/software/bash/manual/bash.html#Conditional-Constructs
-  max_depth="$2"
-fi
-depth_arg=""
-if [[ -n "$max_depth" ]]; then
-  depth_arg="-maxdepth $max_depth"
-fi
-пробелов в именах)
-for file in $(find "$in_dir" $depth_arg -type f); do
-  rel="${file#$in_dir/}" #уже указывал источник где прочитал  про postfix
-  dir_part=$(dirname "$rel") ##https://man7.org/linux/man-pages/man1/dirname.1.html
-  base_name=$(basename "$rel") #https://man7.org/linux/man-pages/man1/basename.1.html
-
-  cp -- "$file" "$out_dir/$dir_part/$base_name"
-
-done
