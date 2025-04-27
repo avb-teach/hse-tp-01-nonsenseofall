@@ -41,28 +41,3 @@ find "$input_dir" -type f | while read -r input_file; do
 
 done
 #--5--
-#тест
-max_depth="" 
-
-while [[ $# -gt 0 ]]; do # В этой версии хочу убедиться в правильночти получения max depth в омандной строке
-    case "$1" in
-        --max_depth)
-            max_depth="$2"
-            shift 2
-            ;;
-        *)
-            exit 1
-            ;;
-    esac
-done
-depth_arg=("$in_dir" -type f)
-if [[ -n "$max_depth" ]]; then
-    depth_arg+=(-maxdepth "$max_depth")
-fi
-find "${depth_arg[@]}" | while read -r file; do
-    relative_path="${file#$in_dir/}"
-    dir_path=$(dirname -- "$relative_path")
-    filename=$(basename -- "$relative_path")  
-    dest="$out_dir/$dir_path/$filename"
-    cp -- "$file" "$dest"
-done
