@@ -1,42 +1,52 @@
 #!/bin/bash
-#--1--
-if [ "$#" -ne 2 ]; then
+#полностью перепишу код, мне кажется ошибка в том что на каком -то из шагов создается директория out и она ломает все тесты после pull request
+#!!! все ссылки на сайты откуда я беру информацию для кодирования на bash находятся в версии  commit final(1) @ 2450add28efb711fdb1e1848dcf2b71d0a44f995  @
+#!/bin/bash
+if [ "$1" = "--max_depth" ]; then #Аналогичное я уже прописывал в commit ветки solution_tp 5-10
+    max_depth="$2"
+    shift 2
+else
+    max_depth=""
+fi
+if [ "$#" -ne 2 ]; then #поддтяжка из старого кода перовго задания
     exit 1
 fi
-#--2--
-in_dir="$1"
-out_dir="$2"
-max_depth=""
-mkdir -p "$out_dir"
-for f in $(find "$in_dir" -maxdepth 2 -type f); do
-    cp "$f" "$out_dir/"
-done
-
-#--3--
-#пробую отдельно для рекурсивного задания переписать, потому что не уверен, 
-#что если уберу для глубины 2, то тест 2 будет пройден корректно
-find "$in_dir" -type f | while read -r file; do #семинар+ https://habr.com/ru/companies/alexhost/articles/525394/ про find 
-    cp "$file" "$out_dir/"
-done
-
-#--4-- 
-# За этот тест уже 2 балла стоит без написанной части
-find "$input_dir" -type f | while read -r input_file; do
-
-    filename=$(basename "$input_file") 
-    file_extension="${filename##*.}" #ссылка на сай где взял строки 26-28 https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
-    file_name_no_ext="${filename%.*}"
-
-    counter=1
-    new_filename="$filename"
-    output_path="$output_dir/$new_filename"
-
-    while [[ -e "$output_path" ]]; do #проверка файла на exist https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html
-        new_filename="${file_name_no_ext}_${counter}.${file_extension}"
-        output_path="$output_dir/$new_filename"
-        ((counter++)) #забыл добавить ссылку на корректное увеличение varaible https://askubuntu.com/questions/385528/how-to-increment-a-variable-in-bash
+input_dir="$1"
+output_dir="$2"
+mkdir -p "$output_dir"
+find "$input_dir" -type f | while IFS= read -r file; do
+    rel="${file#"$input_dir"/}"
+    if [ -n "$max_depth" ]; then
+        tmp="$rel"
+        slash_count=0
+        while [ "${tmp#*/}" != "$tmp" ]; do
+            slash_count=$((slash_count + 1))
+            tmp="${tmp#*/}"
+        done
+        comps=$((slash_count + 1))
+        while [ "$comps" -gt "$max_depth" ]; do
+            rel="${rel#*/}"
+            comps=$((comps - 1))
+        done
+    else
+        rel="${rel##*/}" # ссылки откуда я прочитал про такие методы обрезания в более ранних committ  ветки solution_tp 32-39
+    fi
+    dest="$output_dir/$rel"
+    dir="${dest%/*}"
+    base="${dest##*/}"
+    mkdir -p "$dir"
+    name="${base%.*}"
+    ext="${base##*.}"
+    new_base="$base"
+    count=1
+    while [ -e "$dir/$new_base" ]; do #e-exist ссылка также вв предыдущих commit
+        if [ "$ext" != "$base" ]; then
+            new_base="${name}_${count}.${ext}"
+        else
+            new_base="${name}_${count}"
+        fi
+        count=$((count + 1))
     done
-
-    cp "$input_file" "$output_path"
-
+    cp "$file" "$dir/$new_base"
 done
+
